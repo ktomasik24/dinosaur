@@ -1,0 +1,185 @@
+<!--
+Dino Detective (No-repeat 10 run, 50+ dinos)
+
+CodePen:
+1) Paste HTML here.
+2) Paste CSS in the CSS pane.
+3) Paste JS in the JS pane.
+4) Click Run.
+
+GitHub Pages:
+See instructions after the code in my message (and links in code blocks).
+-->
+
+<div class="app" id="app">
+  <header class="topbar" role="banner" aria-label="Game header">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <div class="title">Dino Detective</div>
+        <div class="subtitle">Guess the dinosaur from clues</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="iconBtn" id="muteBtn" type="button" aria-label="Toggle sound">
+        <span class="iconDot" id="muteDot" aria-hidden="true"></span>
+        <span class="iconBtnText" id="muteText">Sound</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="main" role="main">
+    <!-- Start Screen -->
+    <section class="card start" id="startScreen" aria-label="Start screen">
+      <h1>Pick a level</h1>
+      <p class="helper">
+        Easy has fewer choices. Hard has tricky look-alikes.
+      </p>
+
+      <div class="levelRow" role="radiogroup" aria-label="Difficulty selector">
+        <button class="levelBtn selected" type="button" data-level="easy" aria-pressed="true" id="levelEasy">
+          Easy
+          <span class="levelHint">3 choices</span>
+        </button>
+        <button class="levelBtn" type="button" data-level="medium" aria-pressed="false" id="levelMedium">
+          Medium
+          <span class="levelHint">4 choices</span>
+        </button>
+        <button class="levelBtn" type="button" data-level="hard" aria-pressed="false" id="levelHard">
+          Hard
+          <span class="levelHint">4 choices, tricky</span>
+        </button>
+      </div>
+
+      <div class="startActions">
+        <button class="bigBtn primary" id="startBtn" type="button">
+          Start Game
+        </button>
+      </div>
+
+      <div class="tinyNote">
+        Goal: Get <strong>10</strong> correct answers (not in a row). No repeats inside your 10.
+      </div>
+    </section>
+
+    <!-- Game Screen -->
+    <section class="game" id="gameScreen" aria-label="Game screen" hidden>
+      <div class="hud" role="status" aria-live="polite" aria-label="Scoreboard">
+        <div class="hudItem">
+          <div class="hudLabel">Score</div>
+          <div class="hudValue"><span id="scoreNow">0</span> / <span id="scoreGoal">10</span></div>
+        </div>
+        <div class="hudItem">
+          <div class="hudLabel">Streak</div>
+          <div class="hudValue"><span id="streakNow">0</span></div>
+        </div>
+        <div class="hudItem">
+          <div class="hudLabel">Best</div>
+          <div class="hudValue"><span id="bestStreak">0</span></div>
+        </div>
+        <div class="hudItem">
+          <div class="hudLabel">Level</div>
+          <div class="hudValue" id="levelNow">Easy</div>
+        </div>
+      </div>
+
+      <div class="card question" aria-label="Question card">
+        <div class="mediaRow">
+          <div class="imgWrap" aria-label="Dinosaur picture">
+            <img
+              id="dinoImg"
+              alt="Dinosaur picture"
+              loading="eager"
+              referrerpolicy="no-referrer"
+            />
+            <div class="imgBadge" id="imgBadge" aria-hidden="true">New Dino</div>
+          </div>
+
+          <div class="clueWrap" aria-label="Clues">
+            <h2 class="questionTitle">Who am I?</h2>
+
+            <ul class="clues" id="cluesList" aria-label="Clue list"></ul>
+
+            <div class="hintRow">
+              <button class="bigBtn hint" id="hintBtn" type="button" aria-label="Use a hint (once)">
+                Hint
+              </button>
+              <div class="hintUsed" id="hintUsed" aria-live="polite" hidden>
+                Hint used
+              </div>
+            </div>
+
+            <div class="tinyHelp">
+              Keyboard: press 1–4 to choose an answer. Press H for hint.
+            </div>
+          </div>
+        </div>
+
+        <div class="answers" id="answers" aria-label="Answer choices"></div>
+
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+
+        <!-- Learn More Card -->
+        <div class="learnCard" id="learnCard" aria-label="Learn more card" hidden>
+          <div class="learnTop">
+            <h3 id="learnTitle">Learn more</h3>
+            <div class="pillRow" aria-label="Quick facts">
+              <div class="pill" id="pillDiet" aria-label="Diet"></div>
+              <div class="pill" id="pillEra" aria-label="Era"></div>
+              <div class="pill" id="pillSize" aria-label="Size"></div>
+            </div>
+          </div>
+
+          <ul class="learnFacts" id="learnFacts"></ul>
+
+          <div class="learnActions">
+            <button class="bigBtn primary" id="nextBtn" type="button">
+              Next Dino
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <canvas id="confetti" aria-hidden="true"></canvas>
+    </section>
+
+    <!-- Win Screen -->
+    <section class="card win" id="winScreen" aria-label="Win screen" hidden>
+      <h1>You did it!</h1>
+      <p class="helper">You reached the goal of <strong>10</strong> correct answers.</p>
+
+      <div class="winStats" role="status" aria-live="polite">
+        <div class="stat">
+          <div class="statLabel">Final score</div>
+          <div class="statValue" id="finalScore">10</div>
+        </div>
+        <div class="stat">
+          <div class="statLabel">Best streak</div>
+          <div class="statValue" id="finalBest">0</div>
+        </div>
+        <div class="stat">
+          <div class="statLabel">Level</div>
+          <div class="statValue" id="finalLevel">Easy</div>
+        </div>
+      </div>
+
+      <div class="startActions">
+        <button class="bigBtn primary" id="restartBtn" type="button">
+          Play Again
+        </button>
+        <button class="bigBtn" id="changeLevelBtn" type="button">
+          Change Level
+        </button>
+      </div>
+
+      <div class="tinyNote">
+        Tip: Hard mode uses look-alikes (example: T. rex vs Tarbosaurus).
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer" aria-label="Footer">
+    <span>Made for tiny dinosaur experts.</span>
+  </footer>
+</div>
